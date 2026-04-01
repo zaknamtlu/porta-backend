@@ -24,7 +24,11 @@ def get_listings(
     conn = psycopg2.connect(DATABASE_URL)
     cur = conn.cursor()
 
-    query = "SELECT * FROM listings WHERE 1=1"
+    query = """
+        SELECT id, title, price, location, listing_type, property_type, room_type, has_pool, view_type
+        FROM listings
+        WHERE 1=1
+    """
     params = []
 
     if location:
@@ -60,9 +64,23 @@ def get_listings(
         params.append(view_type)
 
     cur.execute(query, params)
-    data = cur.fetchall()
+    rows = cur.fetchall()
+
+    results = []
+    for row in rows:
+        results.append({
+            "id": row[0],
+            "title": row[1],
+            "price": row[2],
+            "location": row[3],
+            "listing_type": row[4],
+            "property_type": row[5],
+            "room_type": row[6],
+            "has_pool": row[7],
+            "view_type": row[8]
+        })
 
     cur.close()
     conn.close()
 
-    return {"data": data}
+    return {"data": results}
